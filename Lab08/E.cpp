@@ -1,36 +1,38 @@
 #include <iostream>
 using namespace std;
-typedef struct bstNode
+
+struct bstNode
 {
-    int data;
-    int bf;
-    bstNode *lchild, *rchild;
+    int value;
+    int bf; //平衡因子，值为该节点左子树高度减右子树高度
+    bstNode *leftC;
+    bstNode *rightC;
 };
+
 //左旋转
 void leftRot(bstNode *T)
 {
-    bstNode *R = T->rchild;
-    T->rchild = R->lchild;
-    R->lchild = T;
+    bstNode *R = T->rightC;
+    T->rightC = R->leftC;
+    R->leftC = T;
 }
+
 //右旋转
 void rightRot(bstNode *T)
 {
-    bstNode *L = T->lchild;
-    T->lchild = L->rchild;
-    L->rchild = T;
+    bstNode *L = T->leftC;
+    T->leftC = L->rightC;
+    L->rightC = T;
     return;
 }
-#define LH +1
-#define EH 0
-#define RH -1
+
 //T 的左边高，不平衡，使其平衡，右旋转，右旋转前先检查L->bf，
-//如果为RH，L要先进行左旋转，使T->lchild->bf和T->bf一致
+//如果为RH，L要先进行左旋转，使T->leftC->bf和T->bf一致
 void leftBal(bstNode *T)
 {
     bstNode *L, *Lr;
-    L = T->lchild;
-    Lr = L->rchild;
+    L = T->leftC;
+    Lr = L->rightC;
     switch (L->bf)
     {
     case 1:
@@ -58,68 +60,111 @@ void leftBal(bstNode *T)
         break;
     }
 }
+
 //T 的右边高，不平衡，使其平衡，左旋转，左旋转前先检查R->bf,
-//如果为LH，R要先进行右旋转，使T->rchild->bf和T->bf一致
-void RightBalance(BiTree *T)
+//如果为LH，R要先进行右旋转，使T->rightC->bf和T->bf一致
+void rightBal(bstNode *T)
 {
-    BiTree R, Rl;
-    R = (*T)->rchild;
-    Rl = R->lchild;
+    bstNode *R, *Rl;
+    R = T->rightC;
+    Rl = R->leftC;
     switch (R->bf)
     {
-    case RH:
-        R->bf = (*T)->bf = EH;
-        L_Rotate(T);
+    case -1:
+        R->bf = T->bf = 0;
+        leftRot(T);
         break;
-    case LH:
+    case 1:
         switch (R->bf)
         {
-        case LH:
-            R->bf = RH;
-            (*T)->bf = EH;
+        case 1:
+            R->bf = -1;
+            T->bf = 0;
             break;
-        case EH:
-            R->bf = (*T)->bf = EH;
+        case 0:
+            R->bf = T->bf = 0;
             break;
-        case RH:
-            R->bf = EH;
-            (*T)->bf = LH;
+        case -1:
+            R->bf = 0;
+            T->bf = 1;
             break;
         }
-        Rl->bf = EH;
-        R_Rotate(&R);
-        L_Rotate(T);
+        Rl->bf = 0;
+        rightRot(R);
+        leftRot(T);
         break;
     }
 }
-//往平衡二叉树上插入结点
-bool InsertAVL(BiTree *T, int data, bool *taller)
+
+//寻找Successor
+bstNode *findSuc(bstNode *T, bstNode *p, int q)
 {
-    if (*T == NULL) //找到插入位置
+    if (T == NULL)
     {
-        *T = (BiTree)malloc(sizeof(bstNode));
-        (*T)->bf = EH;
-        (*T)->rchild = (*T)->lchild = NULL;
-        (*T)->data = data;
-        *taller = true;
+        return p;
+    }
+    else if (q == T->value)
+    {
+        return T;
+    }
+    else if (q < T->value)
+    {
+        p = T;
+        return findSuc(T->leftC, p, q);
     }
     else
     {
-        if (data == (*T)->data) //树中有相同的结点数据直接返回
+        return findSuc(T->rightC, p, q);
+    }
+}
+
+//寻找Predecessor
+bstNode *findPred(bstNode *T, bstNode *p, int q)
+{
+    if (T == NULL)
+    {
+        return p;
+    }
+    else if (q == T->value)
+    {
+        return T;
+    }
+    else if (q < T->value)
+    {
+        return findPred(T->leftC, p, q);
+    }
+    else
+    {
+        p = T;
+        return findPred(T->rightC, p, q);
+    }
+}
+
+//往平衡二叉树上插入节点
+bool treeInsert(bstNode *T, int val, bool taller)
+{
+    if (T == NULL) //找到插入位置
+    {
+        T = new bstNode{val, 0, NULL, NULL};
+        taller = true;
+    }
+    else
+    {
+        if (val == T->value) //树中有相同的结点数据直接返回
         {
-            *taller = false;
+            taller = false;
             return false;
         }
-        if (data < (*T)->data) //往左子树搜索进行插入
+        if (val < T->value) //往左子树搜索进行插入
         {
-            if (!InsertAVL(&(*T)->lchild, data, taller)) //树中有相同的结点
+            if (!treeInsert(T->leftC, val, taller)) //树中有相同的结点
             {
-                *taller = false;
+                taller = false;
                 return false;
             }
-            if (*taller)
+            if (taller)
             {
-                switch ((*T)->bf) //T插入结点后，检测平衡因子，根据情况，做相应的修改和旋转
+                switch (T->bf) //T插入结点后，检测平衡因子，根据情况，做相应的修改和旋转
                 {
                 case LH:
                     LeftBalance(T); //插入后左边不平衡了，让其左平衡
@@ -138,7 +183,7 @@ bool InsertAVL(BiTree *T, int data, bool *taller)
         }
         else //往右子树搜索进行插入
         {
-            if (!Insert(&(*T)->rchild), data, taller) //树中有相同的结点
+            if (!Insert(&(*T)->rightC), val, taller) //树中有相同的结点
             {
                 *taller = false;
                 return false;
