@@ -30,6 +30,10 @@ int main()
             data = func_a(temp);
             if (rear >= k)
             {
+                if (data <= hp[0])
+                {
+                    continue;
+                }
                 rear--;
                 hp[0] = hp[rear];
                 cur = 0;
