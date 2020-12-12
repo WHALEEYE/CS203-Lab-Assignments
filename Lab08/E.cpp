@@ -1,225 +1,599 @@
 #include <iostream>
 using namespace std;
 
+template <class K>
 struct bstNode
 {
-    int value;
-    int bf; //平衡因子，值为该节点左子树高度减右子树高度
-    bstNode *parent;
-    bstNode *leftC;
-    bstNode *rightC;
+    K value;
+    int bf;
+    long long num;
+    bstNode<K> *parent;
+    bstNode<K> *leftC;
+    bstNode<K> *rightC;
 };
 
-//左旋转
-void leftRot(bstNode *T)
+template <class K>
+class AVLTree
 {
-    bstNode *R = T->rightC;
-    T->rightC = R->leftC;
-    R->leftC = T;
-}
+private:
+    bool taller, lower;
+    bstNode<K> *p;
 
-//右旋转
-void rightRot(bstNode *T)
-{
-    bstNode *L = T->leftC;
-    T->leftC = L->rightC;
-    L->rightC = T;
-    return;
-}
+public:
+    bstNode<K> *root;
 
-//T 的左边高，不平衡，使其平衡，右旋转，右旋转前先检查L->bf，
-//如果为RH，L要先进行左旋转，使T->leftC->bf和T->bf一致
-void leftBal(bstNode *T)
-{
-    bstNode *L, *Lr;
-    L = T->leftC;
-    Lr = L->rightC;
-    switch (L->bf)
+    AVLTree(K rootval)
     {
-    case 1:
-        L->bf = T->bf = 0;
-        rightRot(T);
-        break;
-    case -1:
-        switch (Lr->bf)
+        this->root = new bstNode<K>{rootval, 0, 1, NULL, NULL, NULL};
+    }
+
+    void reNum(bstNode<K> *T)
+    {
+        if (T->leftC != NULL && T->rightC != NULL)
+        {
+            T->num = T->leftC->num + T->rightC->num + 1;
+        }
+        else if (T->leftC != NULL)
+        {
+            T->num = T->leftC->num + 1;
+        }
+        else if (T->rightC != NULL)
+        {
+            T->num = T->rightC->num + 1;
+        }
+        else
+        {
+            T->num = 1;
+        }
+    }
+
+    void leftRot(bstNode<K> *T)
+    {
+        bstNode<K> *R = T->rightC;
+        if (R->leftC != NULL)
+        {
+            R->leftC->parent = T;
+        }
+        T->rightC = R->leftC;
+        if (T->parent != NULL)
+        {
+            if (T->parent->leftC == T)
+            {
+                T->parent->leftC = R;
+            }
+            else
+            {
+                T->parent->rightC = R;
+            }
+        }
+        R->parent = T->parent;
+        T->parent = R;
+        R->leftC = T;
+        reNum(T);
+        reNum(R);
+        if (T == root)
+        {
+            root = R;
+        }
+    }
+
+    void rightRot(bstNode<K> *T)
+    {
+        bstNode<K> *L = T->leftC;
+        if (L->rightC != NULL)
+        {
+            L->rightC->parent = T;
+        }
+        T->leftC = L->rightC;
+        if (T->parent != NULL)
+        {
+            if (T->parent->leftC == T)
+            {
+                T->parent->leftC = L;
+            }
+            else
+            {
+                T->parent->rightC = L;
+            }
+        }
+        L->parent = T->parent;
+        T->parent = L;
+        L->rightC = T;
+        reNum(T);
+        reNum(L);
+        if (T == root)
+        {
+            root = L;
+        }
+    }
+
+    void leftHigh(bstNode<K> *T)
+    {
+        bstNode<K> *L, *Lr;
+        L = T->leftC;
+        Lr = L->rightC;
+        switch (L->bf)
         {
         case 1:
-            L->bf = 0;
-            T->bf = -1;
-            break;
-        case 0:
             L->bf = T->bf = 0;
+            rightRot(T);
             break;
         case -1:
-            L->bf = 1;
-            T->bf = 0;
+            switch (Lr->bf)
+            {
+            case 1:
+                L->bf = 0;
+                T->bf = -1;
+                break;
+            case 0:
+                L->bf = T->bf = 0;
+                break;
+            case -1:
+                L->bf = 1;
+                T->bf = 0;
+                break;
+            }
+            Lr->bf = 0;
+            leftRot(L);
+            rightRot(T);
             break;
         }
-        Lr->bf = 0;
-        leftRot(L);
-        rightRot(T);
-        break;
     }
-}
 
-//T 的右边高，不平衡，使其平衡，左旋转，左旋转前先检查R->bf,
-//如果为LH，R要先进行右旋转，使T->rightC->bf和T->bf一致
-void rightBal(bstNode *T)
-{
-    bstNode *R, *Rl;
-    R = T->rightC;
-    Rl = R->leftC;
-    switch (R->bf)
+    void rightHigh(bstNode<K> *T)
     {
-    case -1:
-        R->bf = T->bf = 0;
-        leftRot(T);
-        break;
-    case 1:
+        bstNode<K> *R, *Rl;
+        R = T->rightC;
+        Rl = R->leftC;
         switch (R->bf)
         {
-        case 1:
-            R->bf = -1;
-            T->bf = 0;
-            break;
-        case 0:
-            R->bf = T->bf = 0;
-            break;
         case -1:
-            R->bf = 0;
-            T->bf = 1;
+            R->bf = T->bf = 0;
+            leftRot(T);
+            break;
+        case 1:
+            switch (R->bf)
+            {
+            case 1:
+                R->bf = -1;
+                T->bf = 0;
+                break;
+            case 0:
+                R->bf = T->bf = 0;
+                break;
+            case -1:
+                R->bf = 0;
+                T->bf = 1;
+                break;
+            }
+            Rl->bf = 0;
+            rightRot(R);
+            leftRot(T);
             break;
         }
-        Rl->bf = 0;
-        rightRot(R);
-        leftRot(T);
-        break;
     }
-}
 
-//寻找Successor
-bstNode *findSuc(bstNode *T, bstNode *p, int q)
-{
-    if (T == NULL)
+    bstNode<K> *findSuc(bstNode<K> *T, K q)
     {
-        return p;
-    }
-    else if (q == T->value)
-    {
-        return T;
-    }
-    else if (q < T->value)
-    {
-        p = T;
-        return findSuc(T->leftC, p, q);
-    }
-    else
-    {
-        return findSuc(T->rightC, p, q);
-    }
-}
-
-//寻找Predecessor
-bstNode *findPred(bstNode *T, bstNode *p, int q)
-{
-    if (T == NULL)
-    {
-        return p;
-    }
-    else if (q == T->value)
-    {
-        return T;
-    }
-    else if (q < T->value)
-    {
-        return findPred(T->leftC, p, q);
-    }
-    else
-    {
-        p = T;
-        return findPred(T->rightC, p, q);
-    }
-}
-
-//往平衡二叉树上插入节点
-void treeInsert(bstNode *T, int val)
-{
-    bool inserted = true;
-    while (true)
-    {
-        if (val < T->value)
+        if (T == NULL)
         {
-            if (T->leftC != NULL)
+            return p;
+        }
+        else if (q == T->value)
+        {
+            return T;
+        }
+        else if (q < T->value)
+        {
+            p = T;
+            return findSuc(T->leftC, q);
+        }
+        else
+        {
+            return findSuc(T->rightC, q);
+        }
+    }
+
+    bstNode<K> *findPred(bstNode<K> *T, K q)
+    {
+        if (T == NULL)
+        {
+            return p;
+        }
+        else if (q == T->value)
+        {
+            return T;
+        }
+        else if (q < T->value)
+        {
+            return findPred(T->leftC, q);
+        }
+        else
+        {
+            p = T;
+            return findPred(T->rightC, q);
+        }
+    }
+
+    void treeInsert(K val)
+    {
+        bstNode<K> *T = root, *cld, *cur;
+        while (true)
+        {
+            if (val == T->value)
             {
+                return;
+            }
+            else if (val < T->value)
+            {
+                if (T->leftC == NULL)
+                {
+                    break;
+                }
                 T = T->leftC;
             }
             else
             {
-                T->leftC = new bstNode{val, 0, NULL, NULL};
-                break;
-            }
-        }
-        else if (val > T->value)
-        {
-            if (T->rightC != NULL)
-            {
+                if (T->rightC == NULL)
+                {
+                    break;
+                }
                 T = T->rightC;
             }
-            else
+        }
+        if (val < T->value)
+        {
+            T->leftC = new bstNode<K>{val, 0, 1, T, NULL, NULL};
+            cur = T;
+            while (cur != NULL)
             {
-                T->rightC = new bstNode{val, 0, NULL, NULL};
+                cur->num++;
+                cur = cur->parent;
+            }
+            switch (T->bf)
+            {
+            case -1:
+                T->bf = 0;
+                taller = false;
+                break;
+            case 0:
+                T->bf = 1;
+                taller = true;
                 break;
             }
         }
         else
         {
-            inserted = false;
-            break;
-        }
-    }
-    if (inserted)
-    {
-        switch (T->bf) //T插入结点后，检测平衡因子，根据情况，做相应的修改和旋转
-        {
-        case 1:
-            leftBal(T); //插入后左边不平衡了，让其左平衡
-            inserted = false;
-            break;
-        case 0:
-            T->bf = 1;
-            inserted = true;
-            break;
-        case -1:
-            T->bf = 0;
-            inserted = false;
-            break;
-        }
-    }
-    else //往右子树搜索进行插入
-    {
-        if (!Insert(&(*T)->rightC), val, inserted) //树中有相同的结点
-        {
-            *inserted = false;
-            return false;
-        }
-        if (*inserted) //插入到右子树中且长高了
-        {
-            switch ((*T)->bf) //T插入结点后，检测平衡因子，根据情况，做相应的修改和旋转
+            T->rightC = new bstNode<K>{val, 0, 1, T, NULL, NULL};
+            cur = T;
+            while (cur != NULL)
             {
-            case LH:
-                (*T)->bf = EH;
-                *inserted = false;
+                cur->num++;
+                cur = cur->parent;
+            }
+            switch (T->bf)
+            {
+            case 1:
+                T->bf = 0;
+                taller = false;
                 break;
-            case EH:
-                (*T)->bf = RH;
-                *inserted = true;
-                break;
-            case RH:
-                R_Balance(T); //插入后右边不平衡了，让其右平衡
-                *inserted = false;
+            case 0:
+                T->bf = -1;
+                taller = true;
                 break;
             }
         }
+        while (T != root)
+        {
+            cld = T;
+            T = T->parent;
+            if (T->leftC == cld)
+            {
+                if (taller)
+                {
+                    switch (T->bf)
+                    {
+                    case -1:
+                        T->bf = 0;
+                        taller = false;
+                        break;
+                    case 0:
+                        T->bf = 1;
+                        taller = true;
+                        break;
+                    case 1:
+                        leftHigh(T);
+                        taller = false;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                if (taller)
+                {
+                    switch (T->bf)
+                    {
+                    case -1:
+                        rightHigh(T);
+                        taller = false;
+                        break;
+                    case 0:
+                        T->bf = -1;
+                        taller = true;
+                        break;
+                    case 1:
+                        T->bf = 0;
+                        taller = false;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    void treeDelete(K val)
+    {
+        bstNode<K> *T, *temp, *U, *cur;
+        T = root;
+        while (val != T->value)
+        {
+            if (val < T->value)
+            {
+                T = T->leftC;
+            }
+            else
+            {
+                T = T->rightC;
+            }
+        }
+        if (T->leftC == NULL && T->rightC == NULL)
+        {
+            temp = T;
+            T = T->parent;
+            if (T == NULL)
+            {
+                root = NULL;
+                return;
+            }
+            if (T->leftC == temp)
+            {
+                T->leftC = NULL;
+                cur = T;
+                while (cur != NULL)
+                {
+                    cur->num--;
+                    cur = cur->parent;
+                }
+                switch (T->bf)
+                {
+                case -1:
+                    rightHigh(T);
+                    lower = false;
+                    break;
+                case 0:
+                    T->bf = -1;
+                    lower = false;
+                    break;
+                case 1:
+                    T->bf = 0;
+                    lower = true;
+                    break;
+                }
+            }
+            else
+            {
+                T->rightC = NULL;
+                cur = T;
+                while (cur != NULL)
+                {
+                    cur->num--;
+                    cur = cur->parent;
+                }
+                switch (T->bf)
+                {
+                case -1:
+                    T->bf = 0;
+                    lower = true;
+                    break;
+                case 0:
+                    T->bf = 1;
+                    lower = false;
+                    break;
+                case 1:
+                    leftHigh(T);
+                    lower = false;
+                    break;
+                }
+            }
+            reBalDel(T, lower);
+        }
+        else if (T->rightC == NULL)
+        {
+            bstNode<K> *temp2;
+            temp2 = T->leftC;
+            temp = T;
+            T = T->parent;
+            temp2->parent = T;
+            if (T == NULL)
+            {
+                root = temp2;
+                return;
+            }
+            if (T->leftC == temp)
+            {
+                T->leftC = temp2;
+            }
+            else
+            {
+                T->rightC = temp2;
+            }
+            cur = T;
+            while (cur != NULL)
+            {
+                cur->num--;
+                cur = cur->parent;
+            }
+            reBalDel(temp2, true);
+        }
+        else
+        {
+            U = findSuc(T->rightC, T->value);
+            T->value = U->value;
+            if (U->rightC == NULL)
+            {
+                temp = U;
+                U = U->parent;
+                if (U->leftC == temp)
+                {
+                    U->leftC = NULL;
+                    cur = U;
+                    while (cur != NULL)
+                    {
+                        cur->num--;
+                        cur = cur->parent;
+                    }
+                    switch (U->bf)
+                    {
+                    case -1:
+                        rightHigh(U);
+                        lower = false;
+                        break;
+                    case 0:
+                        U->bf = -1;
+                        lower = false;
+                        break;
+                    case 1:
+                        U->bf = 0;
+                        lower = true;
+                        break;
+                    }
+                }
+                else
+                {
+                    U->rightC = NULL;
+                    cur = U;
+                    while (cur != NULL)
+                    {
+                        cur->num--;
+                        cur = cur->parent;
+                    }
+                    switch (U->bf)
+                    {
+                    case -1:
+                        U->bf = 0;
+                        lower = true;
+                        break;
+                    case 0:
+                        U->bf = 1;
+                        lower = false;
+                        break;
+                    case 1:
+                        leftHigh(U);
+                        lower = false;
+                        break;
+                    }
+                }
+                reBalDel(U, lower);
+            }
+            else
+            {
+                bstNode<K> *temp2;
+                temp2 = U->rightC;
+                temp = U;
+                U = U->parent;
+                temp2->parent = U;
+                if (U->leftC == temp)
+                {
+                    U->leftC = temp2;
+                }
+                else
+                {
+                    U->rightC = temp2;
+                }
+                cur = U;
+                while (cur != NULL)
+                {
+                    cur->num--;
+                    cur = cur->parent;
+                }
+                reBalDel(temp2, true);
+            }
+        }
+    }
+
+    void reBalDel(bstNode<K> *T, bool lower)
+    {
+        bstNode<K> *cld;
+        cld = T;
+        T = T->parent;
+        while (T != NULL)
+        {
+            if (T->leftC == cld)
+            {
+                if (lower)
+                {
+                    switch (T->bf)
+                    {
+                    case -1:
+                        rightHigh(T);
+                        lower = false;
+                        break;
+                    case 0:
+                        T->bf = -1;
+                        lower = false;
+                        break;
+                    case 1:
+                        T->bf = 0;
+                        lower = true;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                if (lower)
+                {
+                    switch (T->bf)
+                    {
+                    case -1:
+                        T->bf = 0;
+                        lower = true;
+                        break;
+                    case 0:
+                        T->bf = 1;
+                        lower = false;
+                        break;
+                    case 1:
+                        leftHigh(T);
+                        lower = false;
+                        break;
+                    }
+                }
+            }
+            cld = T;
+            T = T->parent;
+        }
+    }
+};
+
+void printAVL(bstNode<int> *T)
+{
+    if (T->leftC != NULL)
+    {
+        printAVL(T->leftC);
+    }
+    if (T->parent != NULL)
+    {
+        cout << T->value << "|" << T->num << "|" << T->parent->value << "|" << T->bf << "  ";
+    }
+    else
+    {
+        cout << T->value << "|" << T->num << "|NULL|" << T->bf << "  ";
+    }
+    if (T->rightC != NULL)
+    {
+        printAVL(T->rightC);
     }
 }
 
@@ -228,6 +602,75 @@ int main()
     ios::sync_with_stdio(false);
     cin.tie(0);
     cout.tie(0);
+    int m, k;
+    cin >> m >> k;
+    int val, seq[m], order[m - k + 1], th;
+    for (int i = 0; i < m; i++)
+    {
+        cin >> seq[i];
+    }
+    AVLTree<int> *a = new AVLTree<int>{seq[0]};
+    for (int i = 0; i < m - k + 1; i++)
+    {
+        cin >> order[i];
+    }
+    for (int i = 1; i < k; i++)
+    {
+        a->treeInsert(seq[i]);
+    }
+    th = order[0];
+    bstNode<int> *T = a->root;
+    while (true)
+    {
+        if (T->num == 1)
+        {
+            cout << T->value << '\n';
+            break;
+        }
+        if ((T->leftC->num + 1) == th)
+        {
+            cout << T->value << '\n';
+            break;
+        }
+        else if ((T->leftC->num + 1) < th)
+        {
+            th = th - T->leftC->value - 1;
+            T = T->rightC;
+        }
+        else
+        {
+            T = T->leftC;
+        }
+    }
 
+    for (int i = k; i < m; i++)
+    {
+        th = order[i - k + 1];
+        a->treeInsert(seq[i]);
+        a->treeDelete(seq[i - k]);
+        T = a->root;
+        while (true)
+        {
+            if (T->num == 1)
+            {
+                cout << T->value << '\n';
+                break;
+            }
+            if ((T->leftC->num + 1) == th)
+            {
+                cout << T->value << '\n';
+                break;
+            }
+            else if ((T->leftC->num + 1) < th)
+            {
+                th = th - T->leftC->value - 1;
+                T = T->rightC;
+            }
+            else
+            {
+                T = T->leftC;
+            }
+        }
+    }
     return 0;
 }
