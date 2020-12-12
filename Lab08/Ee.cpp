@@ -302,105 +302,6 @@ public:
         }
     }
 
-    // bool nodeInsert(bstNode<K> *T, K val)
-    // { // 以T为根节点的平衡二叉树中插入元素val，成功返回true，失败返回false，taller反映树是否长高
-    //     if (T == NULL)
-    //     { // 只有刚开始插入树为空才会执行这一步
-    //         T = new bstNode<K>{val, 0, NULL, NULL};
-    //         return true;
-    //     }
-    //     if (val == T->value)
-    //     {
-    //         taller = false;
-    //         return false;
-    //     }
-    //     else if (val < T->value)
-    //     {
-    //         if (T->leftC == NULL)
-    //         { // 检查左子树
-    //             bstNode<K> *q = new bstNode<K>{val, 0, NULL, NULL};
-    //             T->leftC = q; // 直接插入
-    //             switch (T->bf)
-    //             {
-    //             case 0:
-    //                 T->bf = 1;
-    //                 taller = true;
-    //                 break;
-    //             case -1:
-    //                 T->bf = 0;
-    //                 taller = false;
-    //                 break;
-    //             }
-    //             return true; //成功插入节点之后直接弹出回到上一级，携带taller变量
-    //         }
-    //         if (!nodeInsert(T->leftC, val)) //递归调用，这里进入if语句的情况只有发现重复节点
-    //         {
-    //             return false;
-    //         }
-    //         if (taller) // taller变量为true说明其左子树长高了
-    //         {
-    //             switch (T->bf)
-    //             {       // 检查结点的平衡因子
-    //             case 1: // 原本结点的左子树比右子树高，且在左子树中插入了，需要做左平衡处理，处理之后树的高度不变
-    //                 leftHigh(T);
-    //                 taller = false;
-    //                 break;
-    //             case 0: // 左右子树同样高，在左子树中插入，只是树变高了、平衡因子变为1，但当前不用做平衡处理
-    //                 T->bf = 1;
-    //                 taller = true;
-    //                 break;
-    //             case -1: // 右子树比左子树高，在左子树中插入，树的高度不变，当前结点的平衡因子变为0
-    //                 T->bf = 0;
-    //                 taller = false;
-    //                 break;
-    //             }
-    //         } // 每次递归都平衡一次，直到根节点
-    //     }
-    //     else
-    //     {
-    //         if (T->rightC == NULL)
-    //         { // 检查右子树
-    //             bstNode<K> *q = new bstNode<K>{val, 0, NULL, NULL};
-    //             T->rightC = q;
-    //             switch (T->bf)
-    //             {
-    //             case 0:
-    //                 T->bf = -1;
-    //                 taller = true;
-    //                 break;
-    //             case 1:
-    //                 T->bf = 0;
-    //                 taller = false;
-    //                 break;
-    //             }
-    //             return true;
-    //         }
-    //         if (!nodeInsert(T->rightC, val))
-    //         {
-    //             return false;
-    //         }
-    //         if (taller)
-    //         {
-    //             switch (T->bf)
-    //             {
-    //             case 1:
-    //                 T->bf = 0;
-    //                 taller = false;
-    //                 break;
-    //             case 0:
-    //                 T->bf = -1;
-    //                 taller = true;
-    //                 break;
-    //             case -1:
-    //                 rightHigh(T);
-    //                 taller = false;
-    //                 break;
-    //             }
-    //         }
-    //     }
-    //     return true;
-    // }
-
     void treeDelete(K val)
     {
         bstNode<K> *T = root, *temp, *cld, *U;
@@ -422,15 +323,17 @@ public:
             if (T == NULL)
             {
                 root = NULL;
+                delete temp;
+                return;
             }
-            else if (T->leftC == temp)
+            if (T->leftC == temp)
             {
                 T->leftC = NULL;
                 switch (T->bf)
                 {
                 case -1:
                     rightHigh(T);
-                    lower = 0;
+                    lower = false;
                     break;
                 case 0:
                     T->bf = -1;
@@ -457,20 +360,14 @@ public:
                     break;
                 case 1:
                     leftHigh(T);
-                    lower = true;
+                    lower = false;
                     break;
                 }
             }
             delete temp;
-            lower = true;
-            while (T != NULL)
-            {
-
-                cld = T;
-                T = T->parent;
-            }
+            reBalDel(T, lower);
         }
-        else if (T->rightC == NULL)
+        else if (T->rightC == NULL) // T无右子树，直接将左节点（因为平衡，所以左子树只有一个节点）接上
         {
             U = T->leftC;
             temp = T;
@@ -479,8 +376,9 @@ public:
             if (T == NULL)
             {
                 root = U;
+                return;
             }
-            else if (T->leftC == temp)
+            if (T->leftC == temp)
             {
                 T->leftC = U;
             }
@@ -489,70 +387,56 @@ public:
                 T->rightC = U;
             }
             delete temp;
-            lower = true;
-            cld = U;
-            while (T != NULL)
-            {
-                if (T->leftC == cld)
-                {
-                    if (lower)
-                    {
-                        switch (T->bf)
-                        {
-                        case -1:
-                            rightHigh(T);
-                            lower = false;
-                            break;
-                        case 0:
-                            T->bf = -1;
-                            lower = false;
-                        case 1:
-                            T->bf = 0;
-                            lower = true;
-                        }
-                    }
-                }
-                else
-                {
-                    if (lower)
-                    {
-                        switch (T->bf)
-                        {
-                        case -1:
-                            T->bf = 0;
-                            lower = true;
-                            break;
-                        case 0:
-                            T->bf = 1;
-                            lower = false;
-                        case 1:
-                            leftHigh(T);
-                            lower = false;
-                        }
-                    }
-                }
-                cld = T;
-                T = T->parent;
-            }
+            reBalDel(U, true);
         }
-        else
+        else //又有左子树又有右子树，需要先找到successor
         {
-            U = findPred(T);
-            T->value = U->value;
-            if (U->rightC == NULL)
+            U = findSuc(T);
+            T->value = U->value;   //将T用U替换，这里表示为value的替换
+            if (U->rightC == NULL) //U无右子树，即U为叶子节点（Successor不可能有左子树）
             {
                 temp = U;
                 U = U->parent;
                 if (U->leftC == temp)
                 {
                     U->leftC = NULL;
+                    switch (U->bf)
+                    {
+                    case -1:
+                        rightHigh(U);
+                        lower = false;
+                        break;
+                    case 0:
+                        U->bf = -1;
+                        lower = false;
+                        break;
+                    case 1:
+                        U->bf = 0;
+                        lower = true;
+                        break;
+                    }
                 }
                 else
                 {
                     U->rightC = NULL;
+                    switch (U->bf)
+                    {
+                    case -1:
+                        U->bf = 0;
+                        lower = true;
+                        break;
+                    case 0:
+                        U->bf = 1;
+                        lower = false;
+                        break;
+                    case 1:
+                        leftHigh(U);
+                        lower = false;
+                        break;
+                    }
                 }
-                lower = true;
-                delete temp;
+                delete temp;    
+                reBalDel(U, lower);
             }
             else
             {
@@ -620,13 +504,8 @@ public:
         }
     }
 
-    void reBalanceL(bstNode<K> *T, bool lower)
+    void reBalDel(bstNode<K> *T, bool lower)
     {
-
-        if (T == NULL)
-        {
-            return;
-        }
         bstNode<K> *cld;
         cld = T;
         T = T->parent;
