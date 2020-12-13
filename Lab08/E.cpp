@@ -579,9 +579,9 @@ public:
 
 int main()
 {
-    ios::sync_with_stdio(false);
-    cin.tie(0);
-    cout.tie(0);
+    // ios::sync_with_stdio(false);
+    // cin.tie(0);
+    // cout.tie(0);
     int m, k;
     cin >> m >> k;
     int val, seq[m], order[m - k + 1], th;
@@ -589,11 +589,11 @@ int main()
     {
         cin >> seq[i];
     }
-    AVLTree<int> *a = new AVLTree<int>{seq[0]};
     for (int i = 0; i < m - k + 1; i++)
     {
         cin >> order[i];
     }
+    AVLTree<int> *a = new AVLTree<int>(seq[0]);
     for (int i = 1; i < k; i++)
     {
         a->treeInsert(seq[i]);
@@ -616,6 +616,7 @@ int main()
             }
             else
             {
+                th -= 1;
                 T = T->rightC;
             }
         }
@@ -636,6 +637,10 @@ int main()
     }
     for (int i = k; i < m; i++)
     {
+        if (i == 91)
+        {
+            int k = 0;
+        }
         th = order[i - k + 1];
         a->treeInsert(seq[i]);
         a->treeDelete(seq[i - k]);
@@ -656,6 +661,7 @@ int main()
                 }
                 else
                 {
+                    th -= 1;
                     T = T->rightC;
                 }
             }
