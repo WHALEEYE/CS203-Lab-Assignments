@@ -107,7 +107,7 @@ public:
         }
     }
 
-    void leftHigh(bstNode<K> *T)
+    bstNode<K> *leftHigh(bstNode<K> *T)
     {
         bstNode<K> *L, *Lr;
         L = T->leftC;
@@ -117,6 +117,7 @@ public:
         case 1:
             L->bf = T->bf = 0;
             rightRot(T);
+            return L;
             break;
         case -1:
             switch (Lr->bf)
@@ -136,11 +137,18 @@ public:
             Lr->bf = 0;
             leftRot(L);
             rightRot(T);
+            return Lr;
+            break;
+        case 0:
+            L->bf = -1;
+            T->bf = 1;
+            rightRot(T);
+            return L;
             break;
         }
     }
 
-    void rightHigh(bstNode<K> *T)
+    bstNode<K> *rightHigh(bstNode<K> *T)
     {
         bstNode<K> *R, *Rl;
         R = T->rightC;
@@ -150,9 +158,10 @@ public:
         case -1:
             R->bf = T->bf = 0;
             leftRot(T);
+            return R;
             break;
         case 1:
-            switch (R->bf)
+            switch (Rl->bf)
             {
             case 1:
                 R->bf = -1;
@@ -169,6 +178,13 @@ public:
             Rl->bf = 0;
             rightRot(R);
             leftRot(T);
+            return Rl;
+            break;
+        case 0:
+            R->bf = 1;
+            T->bf = -1;
+            leftRot(T);
+            return R;
             break;
         }
     }
@@ -302,7 +318,7 @@ public:
                         taller = true;
                         break;
                     case 1:
-                        leftHigh(T);
+                        T = leftHigh(T);
                         taller = false;
                         break;
                     }
@@ -315,7 +331,7 @@ public:
                     switch (T->bf)
                     {
                     case -1:
-                        rightHigh(T);
+                        T = rightHigh(T);
                         taller = false;
                         break;
                     case 0:
@@ -368,8 +384,8 @@ public:
                 switch (T->bf)
                 {
                 case -1:
-                    rightHigh(T);
-                    lower = false;
+                    lower = (T->rightC->bf == 0) ? false : true;
+                    T = rightHigh(T);
                     break;
                 case 0:
                     T->bf = -1;
@@ -401,8 +417,8 @@ public:
                     lower = false;
                     break;
                 case 1:
-                    leftHigh(T);
-                    lower = false;
+                    lower = (T->leftC->bf == 0) ? false : true;
+                    T = leftHigh(T);
                     break;
                 }
             }
@@ -456,8 +472,8 @@ public:
                     switch (U->bf)
                     {
                     case -1:
-                        rightHigh(U);
-                        lower = false;
+                        lower = (U->rightC->bf == 0) ? false : true;
+                        U = rightHigh(U);
                         break;
                     case 0:
                         U->bf = -1;
@@ -489,8 +505,8 @@ public:
                         lower = false;
                         break;
                     case 1:
-                        leftHigh(U);
-                        lower = false;
+                        lower = (U->leftC->bf == 0) ? false : true;
+                        U = leftHigh(U);
                         break;
                     }
                 }
@@ -536,8 +552,8 @@ public:
                     switch (T->bf)
                     {
                     case -1:
-                        rightHigh(T);
-                        lower = false;
+                        lower = (T->rightC->bf == 0) ? false : true;
+                        T = rightHigh(T);
                         break;
                     case 0:
                         T->bf = -1;
@@ -565,8 +581,8 @@ public:
                         lower = false;
                         break;
                     case 1:
-                        leftHigh(T);
-                        lower = false;
+                        lower = (T->leftC->bf == 0) ? false : true;
+                        T = leftHigh(T);
                         break;
                     }
                 }
@@ -577,31 +593,11 @@ public:
     }
 };
 
-// void printAVL(bstNode<int> *T)
-// {
-//     if (T->leftC != NULL)
-//     {
-//         printAVL(T->leftC);
-//     }
-//     if (T->parent != NULL)
-//     {
-//         cout << T->value << "|" << T->num << "|" << T->parent->value << "|" << T->bf << "  ";
-//     }
-//     else
-//     {
-//         cout << T->value << "|" << T->num << "|NULL|" << T->bf << "  ";
-//     }
-//     if (T->rightC != NULL)
-//     {
-//         printAVL(T->rightC);
-//     }
-// }
-
 int main()
 {
-    // ios::sync_with_stdio(false);
-    // cin.tie(0);
-    // cout.tie(0);
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+    cout.tie(0);
     int m, k;
     cin >> m >> k;
     int val, seq[m], order[m - k + 1], th;
@@ -647,7 +643,7 @@ int main()
         }
         else if ((T->leftC->num + 1) < th)
         {
-            th = th - T->leftC->value - 1;
+            th = th - T->leftC->num - 1;
             T = T->rightC;
         }
         else
@@ -658,10 +654,6 @@ int main()
 
     for (int i = k; i < m; i++)
     {
-        if (i == 91)
-        {
-            int k = 0;
-        }
         th = order[i - k + 1];
         a->treeInsert(seq[i]);
         a->treeDelete(seq[i - k]);
@@ -693,7 +685,7 @@ int main()
             }
             else if ((T->leftC->num + 1) < th)
             {
-                th = th - T->leftC->value - 1;
+                th = th - T->leftC->num - 1;
                 T = T->rightC;
             }
             else

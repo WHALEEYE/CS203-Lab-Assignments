@@ -19,17 +19,6 @@ private:
     bstNode<K> *p;
 
 public:
-    void reBalDel(bstNode<K> *T, bool lower);
-    void leftRot(bstNode<K> *T);
-    void rightRot(bstNode<K> *T);
-    void leftHigh(bstNode<K> *T);
-    void rightHigh(bstNode<K> *T);
-    bstNode<K> *findSuc(bstNode<K> *T, K q);
-    bstNode<K> *findPred(bstNode<K> *T, K q);
-    void treeInsert(K val);
-    void treeDelete(K val);
-    void reBalDel(bstNode<K> *T, bool lower);
-    AVLTree(K rootval);
     bstNode<K> *root;
 
     AVLTree(K rootval)
@@ -97,7 +86,8 @@ public:
 
     //T 的左边高，不平衡，使其平衡，右旋转，右旋转前先检查L->bf，
     //如果为RH，L要先进行左旋转，使T->leftC->bf和T->bf一致
-    void leftHigh(bstNode<K> *T)
+    //返回平衡后的顶点
+    bstNode<K> *leftHigh(bstNode<K> *T)
     {
         bstNode<K> *L, *Lr;
         L = T->leftC;
@@ -107,6 +97,7 @@ public:
         case 1:
             L->bf = T->bf = 0;
             rightRot(T);
+            return L;
             break;
         case -1:
             switch (Lr->bf)
@@ -126,13 +117,21 @@ public:
             Lr->bf = 0;
             leftRot(L);
             rightRot(T);
+            return Lr;
+            break;
+        case 0:
+            L->bf = -1;
+            T->bf = 1;
+            rightRot(T);
+            return L;
             break;
         }
     }
 
     //T 的右边高，不平衡，使其平衡，左旋转，左旋转前先检查R->bf,
     //如果为LH，R要先进行右旋转，使T->rightC->bf和T->bf一致
-    void rightHigh(bstNode<K> *T)
+    //返回平衡后的顶点
+    bstNode<K> *rightHigh(bstNode<K> *T)
     {
         bstNode<K> *R, *Rl;
         R = T->rightC;
@@ -142,9 +141,10 @@ public:
         case -1:
             R->bf = T->bf = 0;
             leftRot(T);
+            return R;
             break;
         case 1:
-            switch (R->bf)
+            switch (Rl->bf)
             {
             case 1:
                 R->bf = -1;
@@ -161,6 +161,13 @@ public:
             Rl->bf = 0;
             rightRot(R);
             leftRot(T);
+            return Rl;
+            break;
+        case 0:
+            R->bf = 1;
+            T->bf = -1;
+            leftRot(T);
+            return R;
             break;
         }
     }
@@ -211,7 +218,7 @@ public:
 
     void treeInsert(K val)
     {
-        bstNode<K> *T = root, *cld;
+        bstNode<K> *T = root, *cld, *cur;
         while (true)
         {
             if (val == T->value)
@@ -237,7 +244,7 @@ public:
         }
         if (val < T->value)
         {
-            T->leftC = new bstNode<K>{val, 0, T, NULL, NULL};
+            T->leftC = new bstNode<K>{val, 0, 1, T, NULL, NULL};
             switch (T->bf)
             {
             case -1:
@@ -252,7 +259,7 @@ public:
         }
         else
         {
-            T->rightC = new bstNode<K>{val, 0, T, NULL, NULL};
+            T->rightC = new bstNode<K>{val, 0, 1, T, NULL, NULL};
             switch (T->bf)
             {
             case 1:
@@ -284,7 +291,7 @@ public:
                         taller = true;
                         break;
                     case 1:
-                        leftHigh(T);
+                        T = leftHigh(T);
                         taller = false;
                         break;
                     }
@@ -297,7 +304,7 @@ public:
                     switch (T->bf)
                     {
                     case -1:
-                        rightHigh(T);
+                        T = rightHigh(T);
                         taller = false;
                         break;
                     case 0:
@@ -345,8 +352,8 @@ public:
                 switch (T->bf)
                 {
                 case -1:
-                    rightHigh(T);
-                    lower = false;
+                    lower = (T->rightC->bf == 0) ? false : true;
+                    T = rightHigh(T);
                     break;
                 case 0:
                     T->bf = -1;
@@ -372,8 +379,8 @@ public:
                     lower = false;
                     break;
                 case 1:
-                    leftHigh(T);
-                    lower = false;
+                    lower = (T->leftC->bf == 0) ? false : true;
+                    T = leftHigh(T);
                     break;
                 }
             }
@@ -418,8 +425,8 @@ public:
                     switch (U->bf)
                     {
                     case -1:
-                        rightHigh(U);
-                        lower = false;
+                        lower = (U->rightC->bf == 0) ? false : true;
+                        U = rightHigh(U);
                         break;
                     case 0:
                         U->bf = -1;
@@ -445,8 +452,8 @@ public:
                         lower = false;
                         break;
                     case 1:
-                        leftHigh(U);
-                        lower = false;
+                        lower = (U->leftC->bf == 0) ? false : true;
+                        U = leftHigh(U);
                         break;
                     }
                 }
@@ -488,8 +495,8 @@ public:
                     switch (T->bf)
                     {
                     case -1:
-                        rightHigh(T);
-                        lower = false;
+                        lower = (T->rightC->bf == 0) ? false : true;
+                        T = rightHigh(T);
                         break;
                     case 0:
                         T->bf = -1;
@@ -517,8 +524,8 @@ public:
                         lower = false;
                         break;
                     case 1:
-                        leftHigh(T);
-                        lower = false;
+                        lower = (T->leftC->bf == 0) ? false : true;
+                        T = leftHigh(T);
                         break;
                     }
                 }
@@ -528,18 +535,3 @@ public:
         }
     }
 };
-
-int main()
-{
-    ios::sync_with_stdio(false);
-    cin.tie(0);
-    cout.tie(0);
-    AVLTree<int> *a = new AVLTree<int>(80);
-    a->treeInsert(70);
-    a->treeInsert(60);
-    a->treeInsert(50);
-    cout << a->root->leftC->leftC->value << '\n';
-    a->treeDelete(80);
-    cout << a->root->rightC->value << '\n';
-    return 0;
-}
