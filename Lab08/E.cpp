@@ -577,6 +577,26 @@ public:
     }
 };
 
+// void printAVL(bstNode<int> *T)
+// {
+//     if (T->leftC != NULL)
+//     {
+//         printAVL(T->leftC);
+//     }
+//     if (T->parent != NULL)
+//     {
+//         cout << T->value << "|" << T->num << "|" << T->parent->value << "|" << T->bf << "  ";
+//     }
+//     else
+//     {
+//         cout << T->value << "|" << T->num << "|NULL|" << T->bf << "  ";
+//     }
+//     if (T->rightC != NULL)
+//     {
+//         printAVL(T->rightC);
+//     }
+// }
+
 int main()
 {
     // ios::sync_with_stdio(false);
@@ -627,7 +647,7 @@ int main()
         }
         else if ((T->leftC->num + 1) < th)
         {
-            th = th - T->leftC->num - 1;
+            th = th - T->leftC->value - 1;
             T = T->rightC;
         }
         else
@@ -635,6 +655,7 @@ int main()
             T = T->leftC;
         }
     }
+
     for (int i = k; i < m; i++)
     {
         if (i == 91)
@@ -672,7 +693,7 @@ int main()
             }
             else if ((T->leftC->num + 1) < th)
             {
-                th = th - T->leftC->num - 1;
+                th = th - T->leftC->value - 1;
                 T = T->rightC;
             }
             else
