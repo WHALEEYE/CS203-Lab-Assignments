@@ -16,7 +16,6 @@ class AVLTree
 {
 private:
     bool taller, lower;
-    bstNode<K> *p;
 
 public:
     bstNode<K> *root;
@@ -84,7 +83,7 @@ public:
         }
     }
 
-    //T 的左边高，不平衡，使其平衡，右旋转，右旋转前先检查L->bf，
+    //T的左边高，不平衡，使其平衡，右旋转，右旋转前先检查L->bf，
     //如果为RH，L要先进行左旋转，使T->leftC->bf和T->bf一致
     //返回平衡后的顶点
     bstNode<K> *leftHigh(bstNode<K> *T)
@@ -128,7 +127,7 @@ public:
         }
     }
 
-    //T 的右边高，不平衡，使其平衡，左旋转，左旋转前先检查R->bf,
+    //T的右边高，不平衡，使其平衡，左旋转，左旋转前先检查R->bf,
     //如果为LH，R要先进行右旋转，使T->rightC->bf和T->bf一致
     //返回平衡后的顶点
     bstNode<K> *rightHigh(bstNode<K> *T)
@@ -173,7 +172,7 @@ public:
     }
 
     //给定一个值q，寻找以T节点为根的子树中该值的Successor
-    bstNode<K> *findSuc(bstNode<K> *T, K q)
+    bstNode<K> *findSuc(bstNode<K> *T, bstNode<K> *p， K q)
     {
         if (T == NULL)
         {
@@ -195,7 +194,7 @@ public:
     }
 
     //给定一个值q，寻找以T节点为根的子树中该值的Predecessor
-    bstNode<K> *findPred(bstNode<K> *T, K q)
+    bstNode<K> *findPred(bstNode<K> *T, bstNode<K> *p， K q)
     {
         if (T == NULL)
         {
@@ -244,7 +243,7 @@ public:
         }
         if (val < T->value)
         {
-            T->leftC = new bstNode<K>{val, 0, 1, T, NULL, NULL};
+            T->leftC = new bstNode<K>{val, 0, T, NULL, NULL};
             switch (T->bf)
             {
             case -1:
@@ -259,7 +258,7 @@ public:
         }
         else
         {
-            T->rightC = new bstNode<K>{val, 0, 1, T, NULL, NULL};
+            T->rightC = new bstNode<K>{val, 0, T, NULL, NULL};
             switch (T->bf)
             {
             case 1:
@@ -387,7 +386,7 @@ public:
             delete temp;
             reBalDel(T, lower);
         }
-        else if (T->rightC == NULL) // T无右子树，直接用左节点（因为平衡，所以左子树只有一个节点）替换
+        else if (T->rightC == NULL) //T无右子树，直接用左节点（因为平衡，所以左子树只有一个节点）替换
         {
             bstNode<K> *temp2;
             temp2 = T->leftC;
@@ -413,7 +412,7 @@ public:
         }
         else //又有左子树又有右子树，需要先找到successor
         {
-            U = findSuc(T->rightC, T->value);
+            U = findSuc(T->rightC, T->rightC, T->value);
             T->value = U->value;   //将T用U替换，这里表示为value的替换
             if (U->rightC == NULL) //U无右子树，即U为叶子节点（Successor不可能有左子树）
             {

@@ -370,6 +370,7 @@ public:
             if (T == NULL)
             {
                 root = NULL;
+                delete temp;
                 return;
             }
             if (T->leftC == temp)
@@ -422,6 +423,7 @@ public:
                     break;
                 }
             }
+            delete temp;
             reBalDel(T, lower);
         }
         else if (T->rightC == NULL)
@@ -434,6 +436,7 @@ public:
             if (T == NULL)
             {
                 root = temp2;
+                delete temp;
                 return;
             }
             if (T->leftC == temp)
@@ -450,6 +453,7 @@ public:
                 cur->num--;
                 cur = cur->parent;
             }
+            delete temp;
             reBalDel(temp2, true);
         }
         else
@@ -510,6 +514,7 @@ public:
                         break;
                     }
                 }
+                delete temp;
                 reBalDel(U, lower);
             }
             else
@@ -533,6 +538,7 @@ public:
                     cur->num--;
                     cur = cur->parent;
                 }
+                delete temp;
                 reBalDel(temp2, true);
             }
         }
