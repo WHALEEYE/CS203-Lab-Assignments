@@ -17,13 +17,14 @@ public:
         delete hp;
     }
 
-    void deleteTop()
+    K deleteTop()
     {
         if (rear == 0)
         {
-            return;
+            return (K)NULL;
         }
         rear--;
+        K top = hp[0];
         hp[0] = hp[rear];
         curidx = 0;
         while (true)
@@ -52,6 +53,7 @@ public:
                 break;
             }
         }
+        return top;
     }
 
     void insertHeap(K val)
@@ -91,13 +93,14 @@ public:
         delete hp;
     }
 
-    void deleteTop()
+    K deleteTop()
     {
         if (rear == 0)
         {
-            return;
+            return (K)NULL;
         }
         rear--;
+        K top = hp[0];
         hp[0] = hp[rear];
         curidx = 0;
         while (true)
@@ -126,6 +129,7 @@ public:
                 break;
             }
         }
+        return top;
     }
 
     void insertHeap(K val)
