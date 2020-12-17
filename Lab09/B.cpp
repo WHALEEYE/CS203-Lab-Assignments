@@ -21,11 +21,10 @@ int main()
     ios::sync_with_stdio(false);
     cin.tie(0);
     cout.tie(0);
-    int n, m, u, v, top = 0;
-    bool hasCir;
+    int n, m, u, v;
     cin >> n >> m;
-    GraphNode **grp = new GraphNode *[n + 1], *cur;
-    Node *temp;
+    GraphNode **grp = new GraphNode *[n + 1], *cur, *tmp;
+    Node *temp, *curNode;
     for (int i = 1; i <= n; i++)
     {
         temp = new Node{-1, NULL, NULL};
@@ -42,35 +41,46 @@ int main()
         grp[v]->head->pre->next = temp;
         grp[v]->head->pre = temp;
     }
-    bool stop, empty = false;
+    bool stop = false, empty = false;
     while (!stop)
     {
-        stop = true;
+        stop = true, empty = true;
         for (int i = 1; i <= n; i++)
         {
-            if (grp[i] != NULL)
+            if (grp[i] != nil)
             {
-                if (grp[i]->head->next->next == grp[i]->head)
-                {
-                    stop = false;
-                    cur = grp[i];
-                    grp[i] = nil;
-                    break;
-                }
-                else if (grp[i]->head->next == grp[i]->head)
+                empty = false;
+                if (grp[i]->head->next == grp[i]->head)
                 {
                     stop = false;
                     grp[i] = nil;
-                    break;
                 }
-            }
-            empty = true;
-            if (empty)
-            {
-                cout << "Good";
-                return 0;
+                else if (grp[i]->head->next->next == grp[i]->head)
+                {
+                    stop = false;
+                    tmp = grp[grp[i]->head->next->value];
+                    curNode = tmp->head->next;
+                    while (curNode != tmp->head)
+                    {
+                        if (curNode->value == i)
+                        {
+                            temp = curNode;
+                            temp->pre->next = temp->next;
+                            temp->next->pre = temp->pre;
+                            break;
+                        }
+                        curNode = curNode->next;
+                    }
+                    grp[i] = nil;
+                }
             }
         }
+        if (empty)
+        {
+            cout << "Good";
+            return 0;
+        }
     }
+    cout << "Bad";
     return 0;
 }
