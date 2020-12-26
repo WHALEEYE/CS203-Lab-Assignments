@@ -31,10 +31,6 @@ int main()
                     {
                         st = md + 1;
                     }
-                    if (st == ed)
-                    {
-                        break;
-                    }
                 }
                 if (ipt[st] == k)
                 {
@@ -56,10 +52,6 @@ int main()
                     else
                     {
                         ed = md - 1;
-                    }
-                    if (st == ed)
-                    {
-                        break;
                     }
                 }
                 if (ipt[st] == k)

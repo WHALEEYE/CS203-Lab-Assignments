@@ -1,24 +1,8 @@
 #include <iostream>
 using namespace std;
-void mergeSort(int seq[], int tseq[], int idx[], int tidx[], int l, int r);
-void combine(int seq[], int tseq[], int idx[], int tidx[], int l, int mid, int r);
 int mid, s, k, p;
-long long power(int n);
 
-void mergeSort(int seq[], int tseq[], int idx[], int tidx[], int l, int r)
-{
-    if (l < r)
-    {
-        mid = (l + r) / 2;
-        mergeSort(seq, tseq, idx, tidx, l, mid);
-        mid = (l + r) / 2;
-        mergeSort(seq, tseq, idx, tidx, mid + 1, r);
-        mid = (l + r) / 2;
-        combine(seq, tseq, idx, tidx, l, mid, r);
-    }
-}
-
-void combine(int seq[], int tseq[], int idx[], int tidx[], int l, int mid, int r)
+void combine(long long seq[], long long tseq[], int idx[], int tidx[], int l, int mid, int r)
 {
     s = l, k = mid + 1, p = l;
     while (true)
@@ -60,5 +44,18 @@ void combine(int seq[], int tseq[], int idx[], int tidx[], int l, int mid, int r
             break;
         }
         p++;
+    }
+}
+
+void mergeSort(long long seq[], long long tseq[], int idx[], int tidx[], int l, int r)
+{
+    if (l < r)
+    {
+        mid = (l + r) / 2;
+        mergeSort(seq, tseq, idx, tidx, l, mid);
+        mid = (l + r) / 2;
+        mergeSort(seq, tseq, idx, tidx, mid + 1, r);
+        mid = (l + r) / 2;
+        combine(seq, tseq, idx, tidx, l, mid, r);
     }
 }

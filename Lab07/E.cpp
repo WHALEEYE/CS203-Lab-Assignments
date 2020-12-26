@@ -1,10 +1,40 @@
 #include <iostream>
-#include <algorithm>
 typedef long long ll;
-void quickSort(ll seq[], int l, int r);
 ll pivot;
 int i, j;
 using namespace std;
+
+void quickSort(ll seq[], int l, int r)
+{
+    if (l < r)
+    {
+        i = l;
+        j = r;
+        pivot = seq[l];
+        while (i < j)
+        {
+            while (i < j && seq[j] >= pivot)
+            {
+                j--;
+            }
+            if (i < j)
+            {
+                seq[i] = seq[j];
+            }
+            while (i < j && seq[i] < pivot)
+            {
+                i++;
+            }
+            if (i < j)
+            {
+                seq[j] = seq[i];
+            }
+        }
+        seq[i] = pivot;
+        quickSort(seq, l, i - 1);
+        quickSort(seq, i + 1, r);
+    }
+}
 
 int main()
 {
@@ -46,36 +76,4 @@ int main()
         cout << sum << "\n";
     }
     return 0;
-}
-
-void quickSort(ll seq[], int l, int r)
-{
-    if (l < r)
-    {
-        i = l;
-        j = r;
-        pivot = seq[l];
-        while (i < j)
-        {
-            while (i < j && seq[j] >= pivot)
-            {
-                j--;
-            }
-            if (i < j)
-            {
-                seq[i] = seq[j];
-            }
-            while (i < j && seq[i] < pivot)
-            {
-                i++;
-            }
-            if (i < j)
-            {
-                seq[j] = seq[i];
-            }
-        }
-        seq[i] = pivot;
-        quickSort(seq, l, i - 1);
-        quickSort(seq, i + 1, r);
-    }
 }

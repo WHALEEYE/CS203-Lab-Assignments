@@ -1,6 +1,5 @@
 #include <iostream>
 using namespace std;
-void quickSort(long long seq[], int index[], int l, int r);
 long long pivot;
 int idx, i, j;
 

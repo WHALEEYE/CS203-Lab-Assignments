@@ -3,7 +3,33 @@ using namespace std;
 #include <cmath>
 typedef long long ll;
 int x, y, n;
-ll move(ll t, char opr[], int dx, int dy);
+
+ll move(ll t, char opr[], int dx, int dy)
+{
+    ll cx = x, cy = y, cycle = t / n, extra = t % n;
+    cx += dx * cycle;
+    cy += dy * cycle;
+    for (int i = 0; i < extra; i++)
+    {
+        switch (opr[i])
+        {
+        case 'U':
+            cx++;
+            break;
+        case 'L':
+            cx--;
+            break;
+        case 'R':
+            cy++;
+            break;
+        case 'D':
+            cy--;
+            break;
+        }
+    }
+    return abs(cx) + abs(cy);
+}
+
 
 int main()
 {
@@ -54,30 +80,4 @@ int main()
     }
     cout << t << endl;
     return 0;
-}
-
-ll move(ll t, char opr[], int dx, int dy)
-{
-    ll cx = x, cy = y, cycle = t / n, extra = t % n;
-    cx += dx * cycle;
-    cy += dy * cycle;
-    for (int i = 0; i < extra; i++)
-    {
-        switch (opr[i])
-        {
-        case 'U':
-            cx++;
-            break;
-        case 'L':
-            cx--;
-            break;
-        case 'R':
-            cy++;
-            break;
-        case 'D':
-            cy--;
-            break;
-        }
-    }
-    return abs(cx) + abs(cy);
 }

@@ -1,4 +1,4 @@
-#pragma GCC optimize(2)
+// #pragma GCC optimize("O2")
 #include <iostream>
 #include <vector>
 using namespace std;
@@ -112,6 +112,7 @@ int main()
         cin >> n >> m >> qnum;
         int *qry = new int[qnum];
         vector<Edge *> *vertices = new vector<Edge *>[n + 1];
+        // vector<Edge *> vertices[n + 1];
         for (int i = 0; i < m; i++)
         {
             cin >> u >> v >> w;
@@ -202,3 +203,12 @@ void quickSort(vector<Edge *> seq, int l, int r)
         quickSort(seq, i + 1, r);
     }
 }
+
+/*
+1
+3 3 3
+1 2 1
+1 3 1
+2 3 2
+1 2 3
+*/
