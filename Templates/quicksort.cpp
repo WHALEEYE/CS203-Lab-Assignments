@@ -20,7 +20,8 @@ void quickSort(long long seq[], int index[], int l, int r)
             if (i < j)
             {
                 seq[i] = seq[j];
-                index[i++] = index[j];
+                index[i] = index[j];
+                i++;
             }
             while (i < j && seq[i] < pivot)
             {
@@ -29,7 +30,8 @@ void quickSort(long long seq[], int index[], int l, int r)
             if (i < j)
             {
                 seq[j] = seq[i];
-                index[j--] = index[i];
+                index[j] = index[i];
+                j--;
             }
         }
         index[i] = idx;
