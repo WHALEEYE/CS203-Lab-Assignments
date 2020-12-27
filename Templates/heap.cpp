@@ -29,6 +29,10 @@ public:
         curidx = 0;
         while (true)
         {
+            if (2 * curidx + 1 >= rear)
+            {
+                break;
+            }
             if (2 * curidx + 2 >= rear)
             {
                 min = 2 * curidx + 1;
@@ -45,10 +49,6 @@ public:
                 curidx = min;
             }
             else
-            {
-                break;
-            }
-            if (2 * curidx + 1 >= rear)
             {
                 break;
             }
@@ -105,6 +105,10 @@ public:
         curidx = 0;
         while (true)
         {
+            if (2 * curidx + 1 >= rear)
+            {
+                break;
+            }
             if (2 * curidx + 2 >= rear)
             {
                 max = 2 * curidx + 1;
@@ -121,10 +125,6 @@ public:
                 curidx = max;
             }
             else
-            {
-                break;
-            }
-            if (2 * curidx + 1 >= rear)
             {
                 break;
             }
