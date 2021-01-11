@@ -36,7 +36,6 @@ int main() {
 
   GraphNode **stk = new GraphNode *[n];
   GraphNode *topE;
-  bool back = false;
   int top = 0, num = 0;
 
   stk[top++] = grpT[1];
@@ -57,11 +56,9 @@ int main() {
       stk[top] = grpT[topE->nbs[topE->curidx]->ed];
       grpT[topE->nbs[topE->curidx]->ed]->visited = true;
       top++;
-      back = false;
     } else {
       num++;
       top--;
-      back = true;
     }
   }
   if (num != n) {
@@ -69,7 +66,6 @@ int main() {
     return 0;
   }
 
-  back = false;
   num = 0;
   stk[top++] = grp[1];
   grp[1]->visited = true;
@@ -88,11 +84,9 @@ int main() {
       stk[top] = grp[topE->nbs[topE->curidx]->ed];
       grp[topE->nbs[topE->curidx]->ed]->visited = true;
       top++;
-      back = false;
     } else {
       num++;
       top--;
-      back = true;
     }
   }
   if (num != n) {
