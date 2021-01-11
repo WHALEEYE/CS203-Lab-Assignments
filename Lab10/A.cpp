@@ -22,7 +22,7 @@ int main() {
   ios::sync_with_stdio(false);
   cin.tie(0);
   cout.tie(0);
-  int n, m, min, u, v, w, minend = 1;
+  int n, m, min, u, v, w;
   long long sum = 0;
   cin >> n >> m;
   GraphNode **grp = new GraphNode *[n + 1];
