@@ -5,16 +5,16 @@
 using namespace std;
 
 struct Edge {
-  int st;
-  int ed;
+  int v1;
+  int v2;
   long long weight;
 };
 
 struct GraphNode {
   int root;
   int idx;
-  int pt;
-  GraphNode(int idx, int pt) : idx(idx), root(idx), pt(pt) {}
+  long long pt;
+  GraphNode(int idx, long long pt) : idx(idx), root(idx), pt(pt) {}
 };
 
 class BigHeap {
@@ -72,8 +72,6 @@ class BigHeap {
   }
 };
 
-bool comp(Edge *a, Edge *b) { return a->weight > b->weight; }
-
 int main() {
   ios::sync_with_stdio(false);
   cin.tie(0);
@@ -87,7 +85,15 @@ int main() {
     cin >> pt;
     grp[i] = new GraphNode(i, pt);
   }
-
+  BigHeap *bg = new BigHeap(1000000);
+  for (int i = 0; i < n * m; i++) {
+    if (i % m != m - 1) {
+      bg->insertHeap(new Edge{i, i + 1, grp[i]->pt * grp[i + 1]->pt});
+    }
+    if (i / m != n - 1) {
+      bg->insertHeap(new Edge{i, i + m, grp[i]->pt * grp[i + m]->pt});
+    }
+  }
   cout << sum;
   return 0;
 }
