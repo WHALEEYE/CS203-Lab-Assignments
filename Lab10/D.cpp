@@ -11,10 +11,10 @@ struct Edge {
 };
 
 struct GraphNode {
-  int root;
+  int prt;
   int idx;
   long long pt;
-  GraphNode(int idx, long long pt) : idx(idx), root(idx), pt(pt) {}
+  GraphNode(int idx, long long pt) : idx(idx), prt(idx), pt(pt) {}
 };
 
 class BigHeap {
@@ -72,6 +72,12 @@ class BigHeap {
   }
 };
 
+Edge *find(Edge *a) {
+  Edge *x;
+  while (true) {
+    if () }
+}
+
 int main() {
   ios::sync_with_stdio(false);
   cin.tie(0);
@@ -80,7 +86,7 @@ int main() {
   long long sum = 0, pt;
   cin >> n >> m;
   GraphNode **grp = new GraphNode *[n * m];
-  Edge *chosen;
+  Edge *temp_edge;
   for (int i = 0; i < n * m; i++) {
     cin >> pt;
     grp[i] = new GraphNode(i, pt);
@@ -92,6 +98,11 @@ int main() {
     }
     if (i / m != n - 1) {
       bg->insertHeap(new Edge{i, i + m, grp[i]->pt * grp[i + m]->pt});
+    }
+  }
+  while (bg->rear) {
+    temp_edge = bg->deleteTop();
+    if () {
     }
   }
   cout << sum;
