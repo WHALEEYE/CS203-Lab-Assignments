@@ -3,18 +3,18 @@
 #include <iostream>
 #include <vector>
 using namespace std;
-
-struct Edge {
-  int v1;
-  int v2;
-  long long weight;
-};
-
 struct GraphNode {
-  int prt;
+  GraphNode *prt;
   int idx;
   long long pt;
-  GraphNode(int idx, long long pt) : idx(idx), prt(idx), pt(pt) {}
+  GraphNode(GraphNode *prt, int idx, long long pt)
+      : idx(idx), prt(prt), pt(pt) {}
+};
+
+struct Edge {
+  GraphNode *v1;
+  GraphNode *v2;
+  long long weight;
 };
 
 class BigHeap {
@@ -72,11 +72,16 @@ class BigHeap {
   }
 };
 
-Edge *find(Edge *a) {
-  Edge *x;
-  while (true) {
-    if () }
+GraphNode *find(GraphNode *a) {
+  if (a == a->prt) {
+    return a;
+  } else {
+    a->prt = find(a->prt);
+    return a->prt;
+  }
 }
+
+void merge(GraphNode *a, GraphNode *b) { find(a)->prt = find(b); }
 
 int main() {
   ios::sync_with_stdio(false);
@@ -85,24 +90,30 @@ int main() {
   int n, m, max;
   long long sum = 0, pt;
   cin >> n >> m;
-  GraphNode **grp = new GraphNode *[n * m];
+  GraphNode **grp = new GraphNode *[n * m], *temp_grpN;
   Edge *temp_edge;
   for (int i = 0; i < n * m; i++) {
     cin >> pt;
-    grp[i] = new GraphNode(i, pt);
+    temp_grpN = new GraphNode(NULL, i, pt);
+    temp_grpN->prt = temp_grpN;
+    grp[i] = temp_grpN;
   }
   BigHeap *bg = new BigHeap(1000000);
   for (int i = 0; i < n * m; i++) {
     if (i % m != m - 1) {
-      bg->insertHeap(new Edge{i, i + 1, grp[i]->pt * grp[i + 1]->pt});
+      bg->insertHeap(
+          new Edge{grp[i], grp[i + 1], (grp[i]->pt) * (grp[i + 1]->pt)});
     }
     if (i / m != n - 1) {
-      bg->insertHeap(new Edge{i, i + m, grp[i]->pt * grp[i + m]->pt});
+      bg->insertHeap(
+          new Edge{grp[i], grp[i + m], (grp[i]->pt) * (grp[i + m]->pt)});
     }
   }
   while (bg->rear) {
     temp_edge = bg->deleteTop();
-    if () {
+    if (find(temp_edge->v1) != find(temp_edge->v2)) {
+      sum += temp_edge->weight;
+      merge(temp_edge->v1, temp_edge->v2);
     }
   }
   cout << sum;
